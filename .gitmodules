@@ -1,0 +1,18 @@
+[submodule ".upstream/MambaVision"]
+	path = .upstream/MambaVision
+	url = https://github.com/NVlabs/MambaVision
+[submodule ".upstream/TransNeXt"]
+	path = .upstream/TransNeXt
+	url = https://github.com/DaiShiResearch/TransNeXt
+[submodule ".upstream/CheXWorld"]
+	path = .upstream/CheXWorld
+	url = https://github.com/LeapLabTHU/CheXWorld
+[submodule ".upstream/LRFL"]
+	path = .upstream/LRFL
+	url = https://github.com/Statistical-Deep-Learning/LRFL
+[submodule ".upstream/X-WIN"]
+	path = .upstream/X-WIN
+	url = https://github.com/RPIDIAL/X-WIN
+[submodule ".upstream/CARZero"]
+	path = .upstream/CARZero
+	url = https://github.com/laihaoran/CARZero

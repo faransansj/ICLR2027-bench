@@ -4,7 +4,7 @@ sources:
     repository: https://github.com/NVlabs/MambaVision
     commit: 7860a506b2eb844eaaae676f08461ce8c3c26f43
     path: .upstream/MambaVision
-    status: BLOCKED_UNTIL_SOURCE_AND_CHECKPOINT_PRESENT
+    status: BLOCKED_MISSING_CHECKPOINT
     checkpoint:
       path: checkpoints/mambavision_tiny_1k.pth.tar
       url: https://huggingface.co/nvidia/MambaVision-T-1K/resolve/b1de77e17599566d98efb701c0231b1095dc3a67/mambavision_tiny_1k.pth.tar
@@ -13,7 +13,7 @@ sources:
     repository: https://github.com/DaiShiResearch/TransNeXt
     commit: c8a99743b60ac94ac8d2bf66ffe164a440dcfe21
     path: .upstream/TransNeXt
-    status: BLOCKED_UNTIL_SOURCE_AND_CHECKPOINT_PRESENT
+    status: BLOCKED_MISSING_CHECKPOINT
     checkpoint:
       path: checkpoints/transnext_micro_224_1k.pth
       url: https://huggingface.co/DaiShiResearch/transnext-micro-224-1k/resolve/4ce12de0e4611439730d23bea3b90709cacde5f2/transnext_micro_224_1k.pth

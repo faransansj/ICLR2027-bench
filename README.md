@@ -39,7 +39,7 @@ For test fold `f`, validation is `(f + 1) % 5` and the remaining folds train. Th
 
 ## Official sources and checkpoints
 
-Run `scripts/fetch_sources.sh` to clone each exact locked commit into ignored `.upstream/` directories. The registry checks `HEAD` before importing. To download the only artifacts with immutable URLs and published hashes:
+The six official repositories are Git submodules whose gitlinks pin the exact locked commits. Run `scripts/fetch_sources.sh` (or `git submodule update --init --recursive`) after cloning. The registry independently checks `HEAD` before importing. To download the only artifacts with immutable URLs and published hashes:
 
 ```bash
 uv run python scripts/download_checkpoint.py mambavision
