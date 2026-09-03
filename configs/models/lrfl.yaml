@@ -1,0 +1,7 @@
+name: lrfl
+dataset: chexchonet
+source: lrfl
+mechanism: official low-rank feature learning only
+input_size: 224
+num_classes: 2
+status: BLOCKED_MISSING_RELEASED_CHECKPOINT

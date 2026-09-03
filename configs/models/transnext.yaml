@@ -1,0 +1,8 @@
+name: transnext
+dataset: milk10k
+source: transnext
+factory: classification/transnext.py:transnext_micro
+head: head
+input_size: 224
+num_classes: 11
+pretrained_classes: 1000

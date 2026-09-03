@@ -1,0 +1,55 @@
+version: 1
+sources:
+  mambavision:
+    repository: https://github.com/NVlabs/MambaVision
+    commit: 7860a506b2eb844eaaae676f08461ce8c3c26f43
+    path: .upstream/MambaVision
+    status: BLOCKED_UNTIL_SOURCE_AND_CHECKPOINT_PRESENT
+    checkpoint:
+      path: checkpoints/mambavision_tiny_1k.pth.tar
+      url: https://huggingface.co/nvidia/MambaVision-T-1K/resolve/b1de77e17599566d98efb701c0231b1095dc3a67/mambavision_tiny_1k.pth.tar
+      sha256: 952a3e486f94bbe863c753a7ecabe282b2e3b8adbb0d98057e047e4f554c2a9b
+  transnext:
+    repository: https://github.com/DaiShiResearch/TransNeXt
+    commit: c8a99743b60ac94ac8d2bf66ffe164a440dcfe21
+    path: .upstream/TransNeXt
+    status: BLOCKED_UNTIL_SOURCE_AND_CHECKPOINT_PRESENT
+    checkpoint:
+      path: checkpoints/transnext_micro_224_1k.pth
+      url: https://huggingface.co/DaiShiResearch/transnext-micro-224-1k/resolve/4ce12de0e4611439730d23bea3b90709cacde5f2/transnext_micro_224_1k.pth
+      sha256: 18dbc88e9c1eb3b3f7801f91f61ef25db56a276a2ee85c4ae3e940c832410d8f
+  chexworld:
+    repository: https://github.com/LeapLabTHU/CheXWorld
+    commit: 090102758801dc097f53c49d135b835570c8d173
+    path: .upstream/CheXWorld
+    status: BLOCKED_CHECKPOINT_SHA_UNCONFIGURED
+    checkpoint:
+      path: checkpoints/chexworld_pretrained.tar
+      drive_id: 1QKUhIWIicl65UXJIGSh7_rYaq5i08iVn
+      sha256: null
+  lrfl:
+    repository: https://github.com/Statistical-Deep-Learning/LRFL
+    commit: 6c5ce47fd99cbaec915dde8db71d83d03c64423d
+    path: .upstream/LRFL
+    status: BLOCKED_MISSING_RELEASED_CHECKPOINT
+    checkpoint: null
+  x_win:
+    repository: https://github.com/RPIDIAL/X-WIN
+    commit: 6cc45859a07674c4efeb81e7b1d06f8187d206c8
+    path: .upstream/X-WIN
+    status: BLOCKED_UNAVAILABLE_IMPLEMENTATION_AND_CHECKPOINT
+    checkpoint: null
+  carzero:
+    repository: https://github.com/laihaoran/CARZero
+    commit: fa4e09cdfe7801e36e83d96815e3fcf66ffdd13d
+    path: .upstream/CARZero
+    status: BLOCKED_CHECKPOINT_SHA_UNCONFIGURED
+    checkpoints:
+      - name: VITB-16-M3AE_last.ckpt
+        path: checkpoints/VITB-16-M3AE_last.ckpt
+        drive_id: 1QJvtatLuIlYqi-V1DjgHnACM2kq2C-ET
+        sha256: null
+      - name: CARZero_best_model.ckpt
+        path: checkpoints/CARZero_best_model.ckpt
+        drive_id: 1kYF-k5otW5DHwz1En5d_ScV3zu2E27Ch
+        sha256: null

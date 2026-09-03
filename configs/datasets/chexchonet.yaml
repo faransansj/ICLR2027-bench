@@ -1,0 +1,11 @@
+name: chexchonet
+task: multilabel
+num_classes: 2
+num_folds: 5
+manifest: data/chexchonet/manifest.csv
+image_root: data/chexchonet/images
+columns:
+  image: image_path
+  targets: [SLVH, DLV]
+  fold: fold
+  id: sample_id

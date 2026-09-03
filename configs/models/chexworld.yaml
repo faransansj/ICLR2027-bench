@@ -1,0 +1,8 @@
+name: chexworld
+dataset: chexchonet
+source: chexworld
+feature: target_encoder ViT-B/16 pooled feature
+head: Linear(2)
+input_size: 224
+num_classes: 2
+status: BLOCKED_CHECKPOINT_SHA_UNCONFIGURED

@@ -1,0 +1,7 @@
+epochs: 100
+optimizer: AdamW
+loss:
+  multiclass: CrossEntropyLoss
+  multilabel: BCEWithLogitsLoss
+validation: lowest_loss
+split: test=fold, validation=(fold+1)%num_folds, train=remaining_folds

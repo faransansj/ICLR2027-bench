@@ -1,0 +1,8 @@
+name: mambavision
+dataset: milk10k
+source: mambavision
+factory: mamba_vision_T
+head: head
+input_size: 224
+num_classes: 11
+pretrained_classes: 1000

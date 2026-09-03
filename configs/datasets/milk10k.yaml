@@ -1,0 +1,11 @@
+name: milk10k
+task: multiclass
+num_classes: 11
+num_folds: 5
+manifest: data/milk10k/manifest.csv
+image_root: data/milk10k/images
+columns:
+  image: image_path
+  target: label
+  fold: fold
+  id: sample_id
