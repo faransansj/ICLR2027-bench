@@ -126,6 +126,9 @@ def _run_loader(
                     if parameter.grad is not None and not torch.isfinite(parameter.grad).all():
                         raise FloatingPointError("gradients contain NaN or Inf")
                 optimizer.step()
+                for parameter in model.parameters():
+                    if not torch.isfinite(parameter).all():
+                        raise FloatingPointError("model parameters contain NaN or Inf")
             batch_size = targets.shape[0]
             total_loss += float(loss.detach()) * batch_size
             count += batch_size
@@ -302,6 +305,7 @@ def train(args: argparse.Namespace) -> int:
         "started_at": started,
         "completed_at": utc_now(),
         "resolved_runtime": runtime,
+        "source_commit": source["commit"],
         "provenance": _provenance(config_paths),
     }
     manifest_path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")

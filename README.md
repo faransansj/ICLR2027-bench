@@ -15,7 +15,7 @@ A small, auditable scaffold for independent dataset × model × fold runs. It ne
 
 ## Environment
 
-Python 3.11 is required.
+Python 3.12 is required. From the parent directory, `nix develop` provides Python, uv, and build tools.
 
 ```bash
 uv sync
