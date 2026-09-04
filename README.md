@@ -37,7 +37,7 @@ Only immutable, published-hash downloads are automated. CheXWorld and CARZero us
 - `data/milk10k/manifest.csv`: `sample_id,image_path,label,fold`, where label is 0–10.
 - `data/chexchonet/manifest.csv`: `sample_id,image_path,SLVH,DLV,fold`, where both targets are binary.
 
-Images live below the corresponding `data/<dataset>/images/` root. Test fold is `f`, validation fold is `(f + 1) % 5`, and all remaining folds train. Dataset items have exactly `sample_id`, `image`, `target`, and `fold` fields.
+Images live below the corresponding `data/<dataset>/images/` root, which may be a symlink to external storage (for example, `ln -s /path/to/MILK10k_Training_Input data/milk10k/images`). Test fold is `f`, validation fold is `(f + 1) % 5`, and all remaining folds train. Dataset items have exactly `sample_id`, `image`, `target`, and `fold` fields.
 
 ## Run commands
 
