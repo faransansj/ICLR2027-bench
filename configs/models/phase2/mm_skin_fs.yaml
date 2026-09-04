@@ -1,0 +1,7 @@
+name: mm_skin_fs
+dataset: milk10k
+source: mm_skin_fs
+modalities: [clinical_image, dermoscopic_image, metadata]
+status: BLOCKED
+blocked_reason: unavailable implementation
+detail: The public notebook implements PAD-UFES-20 only; no licensed MILK10k implementation or released checkpoint is available.

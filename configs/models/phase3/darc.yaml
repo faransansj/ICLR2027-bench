@@ -1,0 +1,7 @@
+name: darc
+dataset: chexchonet
+source: darc
+modalities: [image]
+status: BLOCKED
+blocked_reason: unavailable implementation
+detail: No author-published code, checkpoint, CheXconf distribution, dependency manifest, or software license is linked from the official publication.

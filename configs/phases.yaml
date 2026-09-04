@@ -1,0 +1,34 @@
+version: 1
+phases:
+  1:
+    status: implemented
+    selection: existing reproducible baselines
+    datasets:
+      milk10k:
+        - mambavision
+        - transnext
+      chexchonet:
+        - chexworld
+        - lrfl
+        - xwin
+        - carzero
+  2:
+    status: preparation
+    selection: candidate methods with an author-published code repository
+    datasets:
+      milk10k:
+        - mm_skin_fs
+        - tcmax
+        - dymo
+        - medrega
+      chexchonet:
+        - radzero
+        - tcmax
+  3:
+    status: blocked
+    selection: candidate methods without an author-published implementation
+    datasets:
+      milk10k:
+        - skinm2former
+      chexchonet:
+        - darc

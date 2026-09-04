@@ -1,0 +1,7 @@
+name: tcmax
+dataset: milk10k
+source: tcmax
+modalities: [clinical_image, dermoscopic_image]
+input_size: 224
+status: READY
+adaptation: TCMax loss with two ResNet-18 image streams trained from scratch on paired MILK10k

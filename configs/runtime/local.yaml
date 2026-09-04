@@ -1,4 +1,5 @@
 device: cuda
+environment: local
 profile: local
 debug: true
 max_epochs: 1
@@ -8,6 +9,6 @@ fold: 0
 precision: fp32
 batch_size: 8
 num_workers: 0
-seed: 1729
+seed: 2027
 learning_rate: 0.0001
 weight_decay: 0.01

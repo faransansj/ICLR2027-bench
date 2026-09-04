@@ -1,6 +1,6 @@
-name: x_win
+name: xwin
 dataset: chexchonet
-source: x_win
+source: xwin
 input_size: 224
 num_classes: 2
 status: BLOCKED_UNAVAILABLE_IMPLEMENTATION_AND_CHECKPOINT

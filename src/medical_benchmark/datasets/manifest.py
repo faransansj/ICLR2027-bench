@@ -96,15 +96,20 @@ class ManifestDataset(Dataset[dict[str, Any]]):
         }
 
 
-def build_fold_datasets(name: str, fold: int, transform: Callable[[Image.Image], torch.Tensor]) -> dict[str, ManifestDataset]:
+def build_fold_datasets(
+    name: str, fold: int, transform: Callable[[Image.Image], torch.Tensor] | dict[str, Callable[[Image.Image], torch.Tensor]]
+) -> dict[str, ManifestDataset]:
     config = load_yaml(f"configs/datasets/{name}.yaml")
     num_folds = int(config["num_folds"])
     if fold not in range(num_folds):
         raise ValueError(f"fold must be in [0, {num_folds - 1}]")
     validation_fold = (fold + 1) % num_folds
     train_folds = set(range(num_folds)) - {fold, validation_fold}
+    transforms = transform if isinstance(transform, dict) else {"train": transform, "validation": transform, "test": transform}
+    if set(transforms) != {"train", "validation", "test"}:
+        raise ValueError("split transforms must define train, validation, and test")
     return {
-        "train": ManifestDataset(config, train_folds, transform),
-        "validation": ManifestDataset(config, {validation_fold}, transform),
-        "test": ManifestDataset(config, {fold}, transform),
+        "train": ManifestDataset(config, train_folds, transforms["train"]),
+        "validation": ManifestDataset(config, {validation_fold}, transforms["validation"]),
+        "test": ManifestDataset(config, {fold}, transforms["test"]),
     }

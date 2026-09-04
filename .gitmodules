@@ -1,18 +1,21 @@
-[submodule ".upstream/MambaVision"]
-	path = .upstream/MambaVision
+[submodule "third_party/phase1/mambavision"]
+	path = third_party/phase1/mambavision
 	url = https://github.com/NVlabs/MambaVision
-[submodule ".upstream/TransNeXt"]
-	path = .upstream/TransNeXt
+[submodule "third_party/phase1/transnext"]
+	path = third_party/phase1/transnext
 	url = https://github.com/DaiShiResearch/TransNeXt
-[submodule ".upstream/CheXWorld"]
-	path = .upstream/CheXWorld
+[submodule "third_party/phase1/chexworld"]
+	path = third_party/phase1/chexworld
 	url = https://github.com/LeapLabTHU/CheXWorld
-[submodule ".upstream/LRFL"]
-	path = .upstream/LRFL
+[submodule "third_party/phase1/lrfl"]
+	path = third_party/phase1/lrfl
 	url = https://github.com/Statistical-Deep-Learning/LRFL
-[submodule ".upstream/X-WIN"]
-	path = .upstream/X-WIN
+[submodule "third_party/phase1/xwin"]
+	path = third_party/phase1/xwin
 	url = https://github.com/RPIDIAL/X-WIN
-[submodule ".upstream/CARZero"]
-	path = .upstream/CARZero
+[submodule "third_party/phase1/carzero"]
+	path = third_party/phase1/carzero
 	url = https://github.com/laihaoran/CARZero
+[submodule "third_party/phase2/tcmax"]
+	path = third_party/phase2/tcmax
+	url = https://github.com/hubaak/TCMax

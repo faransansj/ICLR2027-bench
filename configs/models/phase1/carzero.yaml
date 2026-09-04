@@ -5,4 +5,4 @@ feature: image encoder feature
 head: Linear(2)
 input_size: 224
 num_classes: 2
-status: BLOCKED_CHECKPOINT_SHA_UNCONFIGURED
+status: BLOCKED_MISSING_VERIFIED_DOWNSTREAM_ADAPTER

@@ -3,9 +3,8 @@ __pycache__/
 .venv/
 .upstream/
 checkpoints/
-data/*/manifest.csv
-data/*/images/*
-!data/*/images/.gitkeep
+data/*/manifest*.csv
+data/*/images
 results/*
 !results/.gitkeep
 .pytest_cache/

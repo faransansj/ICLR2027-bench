@@ -1,0 +1,7 @@
+name: dymo
+dataset: milk10k
+source: dymo
+modalities: [clinical_image, dermoscopic_image, metadata]
+status: BLOCKED
+blocked_reason: dataset incompatibility
+detail: Official artifacts are dataset-specific; MILK10k requires new encoders, recovery models, selection statistics, and training.

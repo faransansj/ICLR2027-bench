@@ -3,8 +3,8 @@ sources:
   mambavision:
     repository: https://github.com/NVlabs/MambaVision
     commit: 7860a506b2eb844eaaae676f08461ce8c3c26f43
-    path: .upstream/MambaVision
-    status: BLOCKED_MISSING_CHECKPOINT
+    path: third_party/phase1/mambavision
+    status: READY
     checkpoint:
       path: checkpoints/mambavision_tiny_1k.pth.tar
       url: https://huggingface.co/nvidia/MambaVision-T-1K/resolve/b1de77e17599566d98efb701c0231b1095dc3a67/mambavision_tiny_1k.pth.tar
@@ -12,8 +12,8 @@ sources:
   transnext:
     repository: https://github.com/DaiShiResearch/TransNeXt
     commit: c8a99743b60ac94ac8d2bf66ffe164a440dcfe21
-    path: .upstream/TransNeXt
-    status: BLOCKED_MISSING_CHECKPOINT
+    path: third_party/phase1/transnext
+    status: READY
     checkpoint:
       path: checkpoints/transnext_micro_224_1k.pth
       url: https://huggingface.co/DaiShiResearch/transnext-micro-224-1k/resolve/4ce12de0e4611439730d23bea3b90709cacde5f2/transnext_micro_224_1k.pth
@@ -21,35 +21,101 @@ sources:
   chexworld:
     repository: https://github.com/LeapLabTHU/CheXWorld
     commit: 090102758801dc097f53c49d135b835570c8d173
-    path: .upstream/CheXWorld
-    status: BLOCKED_CHECKPOINT_SHA_UNCONFIGURED
+    path: third_party/phase1/chexworld
+    status: READY
     checkpoint:
       path: checkpoints/chexworld_pretrained.tar
       drive_id: 1QKUhIWIicl65UXJIGSh7_rYaq5i08iVn
-      sha256: null
+      sha256: 175d2c75971daea772d1f338a8cc81540db60fa48f55cbbd9006b2b9b3576a9a
+      sha256_provenance: locally_verified_from_official_drive
+      bytes: 733569866
   lrfl:
     repository: https://github.com/Statistical-Deep-Learning/LRFL
     commit: 6c5ce47fd99cbaec915dde8db71d83d03c64423d
-    path: .upstream/LRFL
+    path: third_party/phase1/lrfl
     status: BLOCKED_MISSING_RELEASED_CHECKPOINT
     checkpoint: null
-  x_win:
+  xwin:
     repository: https://github.com/RPIDIAL/X-WIN
     commit: 6cc45859a07674c4efeb81e7b1d06f8187d206c8
-    path: .upstream/X-WIN
+    path: third_party/phase1/xwin
     status: BLOCKED_UNAVAILABLE_IMPLEMENTATION_AND_CHECKPOINT
     checkpoint: null
   carzero:
     repository: https://github.com/laihaoran/CARZero
     commit: fa4e09cdfe7801e36e83d96815e3fcf66ffdd13d
-    path: .upstream/CARZero
-    status: BLOCKED_CHECKPOINT_SHA_UNCONFIGURED
+    path: third_party/phase1/carzero
+    status: BLOCKED_MISSING_VERIFIED_DOWNSTREAM_ADAPTER
     checkpoints:
       - name: VITB-16-M3AE_last.ckpt
         path: checkpoints/VITB-16-M3AE_last.ckpt
         drive_id: 1QJvtatLuIlYqi-V1DjgHnACM2kq2C-ET
-        sha256: null
+        sha256: 34ac3e67dc937e9371c541e8a734c417e17bd991f7150684560c5d46a706b9bb
+        sha256_provenance: locally_verified_from_official_drive
+        bytes: 4080837637
       - name: CARZero_best_model.ckpt
         path: checkpoints/CARZero_best_model.ckpt
         drive_id: 1kYF-k5otW5DHwz1En5d_ScV3zu2E27Ch
-        sha256: null
+        sha256: d9257c4865898becf3b2ff9ea4bdc4c5ec57da28bc99f4a714812cc589052b33
+        sha256_provenance: locally_verified_from_official_drive
+        bytes: 2568217963
+  mm_skin_fs:
+    repository: https://github.com/SaptarshiPani/MM-Skin-FS
+    commit: f2fde3e6f5f51fa5b9776742f95fec02e535389a
+    path: third_party/phase2/mm_skin_fs
+    license: UNDECLARED
+    status: BLOCKED_UNLICENSED_SOURCE_MISSING_MILK10K_IMPLEMENTATION_AND_CHECKPOINT
+    checkpoint: null
+  tcmax:
+    repository: https://github.com/hubaak/TCMax
+    commit: a950d9b4e9cd5447c3a58d78dddb02930bf2d47f
+    path: third_party/phase2/tcmax
+    license: MIT
+    status: READY_SOURCE_PINNED_TRAIN_FROM_SCRATCH
+    checkpoint: null
+  dymo:
+    repository: https://github.com/siyi-wind/DyMo
+    commit: 4562aeceec1b5dfcd18a84d02d35a0abed9d016a
+    path: third_party/phase2/dymo
+    license: Apache-2.0
+    status: BLOCKED_MISSING_TARGET_DATASET_ADAPTER_AND_ARTIFACTS
+    model_repository: https://huggingface.co/siyiwind/DyMo
+    model_revision: 2bd171d29f133ac270e5b83ba92b23adf1352b6e
+    checkpoint: null
+  medrega:
+    repository: https://github.com/xmed-lab/MedRegA
+    commit: f003c701b0b146e5ca7233ccfd627ee5f9eb3993
+    path: third_party/phase2/medrega
+    license: MIT_CODE_ONLY
+    status: BLOCKED_MISSING_PORTABLE_ENVIRONMENT_COMPLETE_TRAINING_DATA_AND_HARDWARE
+    model_repository: https://huggingface.co/Luxuriant16/medrega
+    model_revision: ec1d98335322b2200f93b35562b681e05fc3a194
+    checkpoint: null
+  radzero:
+    repository: https://github.com/deepnoid-ai/RadZero
+    commit: 656ae5f1af3f106e96c95542ce3ee5c0ee8777fc
+    path: third_party/phase2/radzero
+    license: CC-BY-NC-4.0
+    status: READY_LOCAL_HF_SNAPSHOT_ZERO_SHOT_CHEXCHONET
+    model_repository: https://huggingface.co/Deepnoid/RadZero
+    model_revision: 1e6e7d6295a13aa0a4a7e1c1e2bb36b9ef4e02e8
+    checkpoint:
+      path: checkpoints/radzero/model.safetensors
+      url: https://huggingface.co/Deepnoid/RadZero/resolve/1e6e7d6295a13aa0a4a7e1c1e2bb36b9ef4e02e8/model.safetensors
+      sha256: 7f8edcce8dbc42db753b0b110ab7eb7d5814825733b796f930973c46ee95c622
+  skinm2former:
+    paper: https://openaccess.thecvf.com/content/WACV2025/html/Zhang_A_Novel_Perspective_for_Multi-Modal_Multi-Label_Skin_Lesion_Classification_WACV_2025_paper.html
+    repository: null
+    commit: null
+    path: null
+    license: UNAVAILABLE
+    status: BLOCKED_NO_AUTHOR_PUBLISHED_IMPLEMENTATION_CHECKPOINT_OR_LICENSE
+    checkpoint: null
+  darc:
+    paper: https://openaccess.thecvf.com/content/CVPR2026/html/Liao_DARC_Dual_Adjustment_Reasoning_with_Counterfactuals_for_Trustworthy_Chest_X-ray_CVPR_2026_paper.html
+    repository: null
+    commit: null
+    path: null
+    license: UNAVAILABLE
+    status: BLOCKED_NO_AUTHOR_PUBLISHED_IMPLEMENTATION_CHECKPOINT_DATA_OR_LICENSE
+    checkpoint: null

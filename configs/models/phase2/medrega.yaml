@@ -1,0 +1,7 @@
+name: medrega
+dataset: milk10k
+source: medrega
+modalities: [image, text]
+status: BLOCKED
+blocked_reason: dependency incompatibility
+detail: The released 40B-parameter checkpoint lacks a portable pinned environment and the full training data is not public; benchmark evaluation needs a separate adapter.

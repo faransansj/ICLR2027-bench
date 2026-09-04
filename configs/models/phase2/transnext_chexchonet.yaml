@@ -1,0 +1,9 @@
+name: transnext
+dataset: chexchonet
+source: transnext
+factory: classification/transnext.py:transnext_micro
+head: head
+input_size: 224
+num_classes: 2
+pretrained_classes: 1000
+adaptation: official ImageNet encoder with Linear(2) multilabel head

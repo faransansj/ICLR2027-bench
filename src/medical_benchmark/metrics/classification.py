@@ -6,7 +6,15 @@ import numpy as np
 
 
 def require_finite(value: Any, name: str = "value") -> None:
-    if not np.isfinite(np.asarray(value, dtype=float)).all():
+    if isinstance(value, dict):
+        for key, child in value.items():
+            require_finite(child, f"{name}.{key}")
+        return
+    if isinstance(value, (list, tuple)):
+        for index, child in enumerate(value):
+            require_finite(child, f"{name}[{index}]")
+        return
+    if value is not None and not np.isfinite(np.asarray(value, dtype=float)).all():
         raise FloatingPointError(f"{name} contains NaN or Inf")
 
 
@@ -43,15 +51,21 @@ def compute_metrics(task: str, targets: np.ndarray, probabilities: np.ndarray) -
         prediction = probabilities.argmax(axis=1)
         classes = probabilities.shape[1]
         f1 = [_binary_f1((targets == index).astype(int), (prediction == index).astype(int)) for index in range(classes)]
-        return {"accuracy": float((prediction == targets).mean()), "macro_f1": float(np.mean(f1))}
+        return {
+            "accuracy": float((prediction == targets).mean()),
+            "macro_f1": float(np.mean(f1)),
+            "class_f1": {str(index): float(value) for index, value in enumerate(f1)},
+        }
     if task == "multilabel":
         prediction = (probabilities >= 0.5).astype(int)
         f1 = [_binary_f1(targets[:, index], prediction[:, index]) for index in range(targets.shape[1])]
         aucs = [_binary_auroc(targets[:, index], probabilities[:, index]) for index in range(targets.shape[1])]
         valid_aucs = [value for value in aucs if value is not None]
+        label_names = ("SLVH", "DLV")
         return {
-            "exact_match_accuracy": float((prediction == targets).all(axis=1).mean()),
+            "emr": float((prediction == targets).all(axis=1).mean()),
             "macro_f1": float(np.mean(f1)),
+            "label_f1": {name: float(value) for name, value in zip(label_names, f1, strict=True)},
             "macro_auroc": float(np.mean(valid_aucs)) if valid_aucs else None,
         }
     raise ValueError(f"unsupported task: {task}")

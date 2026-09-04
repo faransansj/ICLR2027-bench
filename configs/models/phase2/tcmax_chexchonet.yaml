@@ -1,0 +1,14 @@
+name: tcmax
+dataset: chexchonet
+source: tcmax
+modalities: [image, clinical_tabular]
+tabular_features: [age, sex]
+target: joint_class
+num_classes: 4
+multilabel_probabilities:
+  SLVH: [1, 3]
+  DLV: [2, 3]
+training: from_scratch
+status: BLOCKED
+blocked_reason: unavailable implementation
+detail: Source and modality protocol are pinned; the CheXchoNet image-tabular loader and TCMax training runner remain to be implemented.

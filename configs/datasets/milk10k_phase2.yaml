@@ -1,0 +1,15 @@
+name: milk10k
+phase: 2
+task: multiclass
+num_classes: 11
+num_folds: 5
+manifest: data/milk10k/manifest_phase2.csv
+image_root: data/milk10k/images
+modalities: [clinical_image, dermoscopic_image, metadata]
+columns:
+  id: sample_id
+  clinical_image: clinical_path
+  dermoscopic_image: dermoscopic_path
+  metadata: [age_approx, sex, skin_tone_class, site]
+  target: label
+  fold: fold

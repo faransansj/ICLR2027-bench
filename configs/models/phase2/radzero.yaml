@@ -1,0 +1,10 @@
+name: radzero
+dataset: chexchonet
+source: radzero
+modalities: [image, text_query]
+input_size: 518
+threshold: 0.5
+prompts:
+  SLVH: There is severe left ventricular hypertrophy
+  DLV: There is a dilated left ventricle
+status: READY

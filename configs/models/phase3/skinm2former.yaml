@@ -1,0 +1,7 @@
+name: skinm2former
+dataset: milk10k
+source: skinm2former
+modalities: [clinical_image, dermoscopic_image, metadata]
+status: BLOCKED
+blocked_reason: unavailable implementation
+detail: No author-published code, checkpoint, dependency manifest, or software license is linked from the official publication.

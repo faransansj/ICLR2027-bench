@@ -9,7 +9,7 @@ from typing import Any
 
 import torch
 
-REQUIRED = ("manifest.json", "metrics.json", "predictions.csv", "best.pt", "last.pt")
+REQUIRED = ("run_manifest.json", "fold_metrics.json", "predictions.csv", "best.pt", "last.pt", "train.log")
 
 
 def _check_finite(value: Any, location: str) -> None:
@@ -28,17 +28,18 @@ def validate_run(path: str | Path) -> dict[str, Any]:
     missing = [name for name in REQUIRED if not (path / name).is_file()]
     if missing:
         raise ValueError(f"missing required artifacts: {missing}")
-    manifest = json.loads((path / "manifest.json").read_text(encoding="utf-8"))
+    manifest = json.loads((path / "run_manifest.json").read_text(encoding="utf-8"))
     if manifest.get("status") != "COMPLETED":
         raise ValueError(f"run status is not COMPLETED: {manifest.get('status')}")
-    identity = manifest.get("run_identity")
+    identity = manifest.get("run_id")
     if not isinstance(identity, str) or len(identity) != 64:
-        raise ValueError("manifest has no valid run identity")
-    metrics = json.loads((path / "metrics.json").read_text(encoding="utf-8"))
-    for required_split in ("train", "validation", "test"):
-        if not isinstance(metrics.get(required_split), dict) or "loss" not in metrics[required_split]:
-            raise ValueError(f"metrics missing {required_split} split")
-    _check_finite(metrics, "metrics")
+        raise ValueError("manifest has no valid run_id")
+    metrics = json.loads((path / "fold_metrics.json").read_text(encoding="utf-8"))
+    if metrics.get("status") != "completed" or metrics.get("run_id") != identity:
+        raise ValueError("fold_metrics status or run_id mismatch")
+    if not isinstance(metrics.get("validation"), dict) or not isinstance(metrics.get("test"), dict):
+        raise ValueError("fold_metrics missing validation/test")
+    _check_finite(metrics, "fold_metrics")
     for checkpoint_name in ("best.pt", "last.pt"):
         checkpoint = torch.load(path / checkpoint_name, map_location="cpu", weights_only=False)
         if checkpoint.get("run_identity") != identity:
@@ -48,7 +49,8 @@ def validate_run(path: str | Path) -> dict[str, Any]:
     if len(rows) < 2 or not rows[0] or rows[0][0] != "sample_id":
         raise ValueError("predictions.csv is empty or malformed")
     provenance = manifest.get("provenance", {})
-    for field in ("git_commit", "git_diff", "files_sha256", "torch", "cuda_runtime"):
+    for field in ("benchmark_commit", "uv_lock_hash", "dataset_manifest_hash", "split_manifest_hash",
+                  "cuda_version", "pytorch_version", "timestamp_start", "timestamp_end"):
         if field not in provenance:
             raise ValueError(f"manifest provenance missing {field}")
     return {"status": "VALID", "path": str(path), "run_identity": identity}
