@@ -425,7 +425,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--dataset", required=True, choices=tuple(COMPATIBLE_MODELS))
     parser.add_argument("--model", required=True, choices=tuple(model for values in COMPATIBLE_MODELS.values() for model in values))
     parser.add_argument("--fold", type=int)
-    parser.add_argument("--runtime", choices=("local", "server"), default="local")
+    parser.add_argument("--runtime", choices=("local", "local-full", "server"), default="local")
     parser.add_argument("--output-root", default=str(ROOT / "results"))
     parser.add_argument("--max-epochs", type=int)
     parser.add_argument("--max-train-batches", type=int)

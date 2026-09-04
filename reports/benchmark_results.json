@@ -25,6 +25,31 @@
       ],
       "mean": {"macro_f1": 0.383749}
     },
+    "chexchonet/mambavision": {
+      "status": "COMPLETED",
+      "label": "preliminary 5-fold/10-epoch",
+      "mode": "supervised fine-tuning",
+      "folds": [
+        {"fold": 0, "macro_f1": 0.133338, "macro_auroc": 0.785565, "emr": 0.866113},
+        {"fold": 1, "macro_f1": 0.083629, "macro_auroc": 0.754929, "emr": 0.864078},
+        {"fold": 2, "macro_f1": 0.058375, "macro_auroc": 0.749629, "emr": 0.864148},
+        {"fold": 3, "macro_f1": 0.113091, "macro_auroc": 0.782188, "emr": 0.864706},
+        {"fold": 4, "macro_f1": 0.069032, "macro_auroc": 0.756671, "emr": 0.862430}
+      ],
+      "mean": {
+        "macro_f1": 0.091493,
+        "macro_auroc": 0.765796,
+        "emr": 0.864295,
+        "label_f1": {"SLVH": 0.022933, "DLV": 0.160053}
+      },
+      "compute": {
+        "gpu": "NVIDIA GeForce RTX 2080",
+        "precision": "fp32",
+        "batch_size": 8,
+        "params_million": 31.154530,
+        "peak_gpu_memory_mb": 970
+      }
+    },
     "chexchonet/radzero": {
       "status": "COMPLETED",
       "mode": "zero-shot",

@@ -15,6 +15,12 @@ class ContractTest(unittest.TestCase):
             {"device": "cuda", "profile": "local", "debug": True, "max_epochs": 1, "max_train_batches": 20,
              "max_val_batches": 10, "fold": 0, "precision": "fp32"},
         )
+        local_full = load_yaml("configs/runtime/local-full.yaml")
+        self.assertEqual(
+            {key: local_full[key] for key in ("device", "profile", "debug", "max_epochs", "max_train_batches", "max_val_batches", "fold", "precision", "batch_size", "num_workers")},
+            {"device": "cuda", "profile": "local-full", "debug": False, "max_epochs": None, "max_train_batches": None,
+             "max_val_batches": None, "fold": None, "precision": "fp32", "batch_size": 8, "num_workers": 4},
+        )
         server = load_yaml("configs/runtime/server.yaml")
         self.assertEqual(
             {key: server[key] for key in ("device", "profile", "debug", "max_epochs", "max_train_batches", "max_val_batches", "fold", "precision")},

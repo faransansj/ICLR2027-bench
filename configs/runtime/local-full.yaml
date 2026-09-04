@@ -1,0 +1,14 @@
+device: cuda
+environment: local
+profile: local-full
+debug: false
+max_epochs: null
+max_train_batches: null
+max_val_batches: null
+fold: null
+precision: fp32
+batch_size: 8
+num_workers: 4
+seed: 2027
+learning_rate: 0.0001
+weight_decay: 0.01
