@@ -1,0 +1,52 @@
+{
+  "schema_version": "1.0",
+  "datasets": {
+    "milk10k": {
+      "samples": 5240,
+      "task": "11-class classification",
+      "folds": 5
+    },
+    "chexchonet": {
+      "samples": 71589,
+      "task": "SLVH/DLV multilabel classification",
+      "folds": 5,
+      "restriction": "aggregate metrics only; source data and sample-level predictions are not published"
+    }
+  },
+  "results": {
+    "milk10k/transnext": {
+      "status": "COMPLETED",
+      "folds": [
+        {"fold": 0, "macro_f1": 0.455006},
+        {"fold": 1, "macro_f1": 0.436739},
+        {"fold": 2, "macro_f1": 0.330710},
+        {"fold": 3, "macro_f1": 0.327255},
+        {"fold": 4, "macro_f1": 0.369034}
+      ],
+      "mean": {"macro_f1": 0.383749}
+    },
+    "chexchonet/radzero": {
+      "status": "COMPLETED",
+      "mode": "zero-shot",
+      "folds": [
+        {"fold": 0, "macro_f1": 0.196082, "macro_auroc": 0.738516, "emr": 0.353401},
+        {"fold": 1, "macro_f1": 0.188621, "macro_auroc": 0.717179, "emr": 0.348187},
+        {"fold": 2, "macro_f1": 0.190155, "macro_auroc": 0.713741, "emr": 0.347419},
+        {"fold": 3, "macro_f1": 0.189842, "macro_auroc": 0.707707, "emr": 0.364252},
+        {"fold": 4, "macro_f1": 0.191812, "macro_auroc": 0.715257, "emr": 0.357612}
+      ],
+      "mean": {
+        "macro_f1": 0.191302,
+        "macro_auroc": 0.718480,
+        "emr": 0.354174,
+        "label_f1": {"SLVH": 0.215827, "DLV": 0.166778}
+      },
+      "compute": {
+        "gpu": "NVIDIA GeForce RTX 2080",
+        "params_million": 209.392513,
+        "inference_ms_per_sample": 85.284057,
+        "peak_gpu_memory_mb": 2725
+      }
+    }
+  }
+}

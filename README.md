@@ -73,6 +73,8 @@ Server full scheduling (30 independent jobs dynamically assigned at job level):
 
 ## Results
 
+Public aggregate metrics are tracked in [`reports/benchmark_results.json`](reports/benchmark_results.json). Restricted datasets and sample-level predictions are never published.
+
 Each run writes:
 
 ```text
