@@ -127,6 +127,14 @@ def _replace_linear_head(model: nn.Module, attribute: str, classes: int) -> None
     setattr(model, attribute, nn.Linear(head.in_features, classes))
 
 
+def _make_transnext_pooling_deterministic(model: nn.Module) -> None:
+    for module in model.modules():
+        pool = getattr(module, "pool", None)
+        ratio = getattr(module, "sr_ratio", None)
+        if isinstance(pool, nn.AdaptiveAvgPool2d) and isinstance(ratio, int):
+            module.pool = nn.AvgPool2d(ratio, ratio)
+
+
 def _chexworld_modules(source_path: Path) -> tuple[Any, Any]:
     package_name = "_medical_benchmark_chexworld"
     if package_name not in sys.modules:
@@ -187,4 +195,6 @@ def build_model(name: str, dataset: str | None = None) -> nn.Module:
     state = _state_dict(torch.load(checkpoint, map_location="cpu", weights_only=False))
     model.load_state_dict(state, strict=True)  # Load the official 1000-class head before replacing it.
     _replace_linear_head(model, config["head"], int(config["num_classes"]))
+    if name == "transnext":
+        _make_transnext_pooling_deterministic(model)
     return model
