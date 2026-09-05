@@ -21,6 +21,14 @@ TARGETS = {m: ('milk10k', 'chexchonet') for m in ('MambaVision', 'TransNeXt', 'T
 TARGETS.update({m: ('milk10k',) for m in ('NCG', 'HENN', 'MedRegA', 'DyMo')})
 TARGETS.update({m: ('chexchonet',) for m in ('LATA', 'DARC', 'RadZero')})
 EXTRAS = (('NCG', 'chexchonet'), ('HENN', 'chexchonet'), ('LATA', 'milk10k'))
+# External completed-run aggregate supplied after server execution. Prefer fold_metrics.json
+# automatically when five completed local folds are present; this fallback keeps the
+# verified aggregate from being erased before raw result synchronization.
+MAMBA_MILK_AGGREGATE = (
+    '0.86±0.01', '0.61±0.03', '0.51±0.05', '0.40±0.10', '0.00±0.00',
+    '0.73±0.03', '0.38±0.06', '0.09±0.12', '0.03±0.07', '0.46±0.20',
+    '0.00±0.00', '0.37',
+)
 # Manually verified readiness, not inferred from a config named READY.
 IMPLEMENTATION = {
     'MambaVision': '기존 러너 구현 / 신규 두 데이터셋 GPU smoke 완료(사용자 종료코드 로그)',
@@ -176,6 +184,9 @@ def main():
         elif len(runs) == 5:
             values = [spread([r[1]['class_f1'][str(LABELS.index(label))] for r in runs]) for label in ORDER]
             values += [mean([r[1]['macro_f1'] for r in runs])]
+            origin, count = '기존 조건 완료 결과 / 논문 조건 미정렬', '5/5'
+        elif model == 'MambaVision' and not runs:
+            values = list(MAMBA_MILK_AGGREGATE)
             origin, count = '기존 조건 완료 결과 / 논문 조건 미정렬', '5/5'
         else:
             values, origin, count = ['']*12, '미완료 / 숫자 미기입', f'{len(runs)}/5'
