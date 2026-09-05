@@ -1,0 +1,21 @@
+﻿Phase,모델,대상 데이터셋,구현·검증,학습·평가,현재 실행 위치(로컬 직접 확인),서버 마지막 확인(현재 상태 아님),데이터 확보
+1,MambaVision,milk10k,기존 러너 구현 / 신규 패키지 CUDA smoke 미검증,완료 결과 없음 / 과거 mamba_ssm 누락 차단,,,"서버 원본·기존 manifest 확보(사용자 확인); 로컬 manifest 확보, 이미지 폴더 비어 있음"
+1,MambaVision,chexchonet,기존 러너 구현 / 신규 패키지 CUDA smoke 미검증,5/5 완료,,,서버 원본·manifest 확보(사용자 확인); 로컬 원본 링크·manifest 확보
+1,TransNeXt,milk10k,기존 러너 구현 / 신규 CPU forward 검증·GPU smoke 미검증,5/5 완료,,,"서버 원본·기존 manifest 확보(사용자 확인); 로컬 manifest 확보, 이미지 폴더 비어 있음"
+1,TransNeXt,chexchonet,기존 러너 구현 / 신규 CPU forward 검증·GPU smoke 미검증,5/5 완료,,,서버 원본·manifest 확보(사용자 확인); 로컬 원본 링크·manifest 확보
+1,TCMax,milk10k,기존 두 데이터셋 러너 구현 / 논문 예산 적용판 CPU 검증·GPU smoke 미검증,완료 결과 없음,,"연세대 GPU 5·6, 2026-09-06 01:17:54 KST 사용자 캡처: 기존 benchmark 실행 / 현 dataset·fold 미확인","서버 원본·기존 manifest 확보(사용자 확인); 로컬 manifest 확보, 이미지 폴더 비어 있음"
+1,TCMax,chexchonet,기존 두 데이터셋 러너 구현 / 논문 예산 적용판 CPU 검증·GPU smoke 미검증,1/5 완료 / 로컬 실행 중,로컬 NixOS / RTX 2080,"연세대 GPU 5·6, 2026-09-06 01:17:54 KST 사용자 캡처: 기존 benchmark 실행 / 현 dataset·fold 미확인",서버 원본·manifest 확보(사용자 확인); 로컬 원본 링크·manifest 확보
+2,IVON,milk10k,공식 v0.1.2 CPU 실행 검증 / 실제 데이터 학습 러너 미완성,완료 결과 없음,,,"서버 원본·기존 manifest 확보(사용자 확인); 로컬 manifest 확보, 이미지 폴더 비어 있음"
+2,IVON,chexchonet,공식 v0.1.2 CPU 실행 검증 / 실제 데이터 학습 러너 미완성,완료 결과 없음,,,서버 원본·manifest 확보(사용자 확인); 로컬 원본 링크·manifest 확보
+2,ABNN,milk10k,공식 구현 조사 / 학습 어댑터 미구현,완료 결과 없음,,,"서버 원본·기존 manifest 확보(사용자 확인); 로컬 manifest 확보, 이미지 폴더 비어 있음"
+2,ABNN,chexchonet,공식 구현 조사 / 학습 어댑터 미구현,완료 결과 없음,,,서버 원본·manifest 확보(사용자 확인); 로컬 원본 링크·manifest 확보
+2,NCG,milk10k,공식 구현 조사 / DAG·train-only 어댑터 미준비,완료 결과 없음,,,"서버 원본·기존 manifest 확보(사용자 확인); 로컬 manifest 확보, 이미지 폴더 비어 있음; 방법별 추가 입력/아티팩트는 미준비"
+2,HENN,milk10k,공식 구현 조사 / 복합 라벨·어댑터 미준비,완료 결과 없음,,,"서버 원본·기존 manifest 확보(사용자 확인); 로컬 manifest 확보, 이미지 폴더 비어 있음; 방법별 추가 입력/아티팩트는 미준비"
+2,LATA,chexchonet,방법 조사 / 공식 아티팩트·calibration 미준비,완료 결과 없음,,,서버 원본·manifest 확보(사용자 확인); 로컬 원본 링크·manifest 확보; 방법별 추가 입력/아티팩트는 미준비
+3,MedRegA,milk10k,소스 정보 확보 / 환경·어댑터 미준비,완료 결과 없음,,,"서버 원본·기존 manifest 확보(사용자 확인); 로컬 manifest 확보, 이미지 폴더 비어 있음; 방법별 추가 입력/아티팩트는 미준비"
+3,DyMo,milk10k,소스 확보 / 데이터셋 전용 학습 경로 미준비,완료 결과 없음,,,"서버 원본·기존 manifest 확보(사용자 확인); 로컬 manifest 확보, 이미지 폴더 비어 있음; 방법별 추가 입력/아티팩트는 미준비"
+3,DARC,chexchonet,공식 구현·체크포인트 미확보,완료 결과 없음,,,서버 원본·manifest 확보(사용자 확인); 로컬 원본 링크·manifest 확보
+3,RadZero,chexchonet,zero-shot 평가 러너 구현,5/5 완료 (zero-shot 평가),,,서버 원본·manifest 확보(사용자 확인); 로컬 원본 링크·manifest 확보
+ex,NCG,chexchonet,추가 적용 검토 / 해당 데이터셋 어댑터 미구현,미실행,,,서버 원본·manifest 확보(사용자 확인); 로컬 원본 링크·manifest 확보; 추가 조합 프로토콜 미확정
+ex,HENN,chexchonet,추가 적용 검토 / 해당 데이터셋 어댑터 미구현,미실행,,,서버 원본·manifest 확보(사용자 확인); 로컬 원본 링크·manifest 확보; 추가 조합 프로토콜 미확정
+ex,LATA,milk10k,추가 적용 검토 / 해당 데이터셋 어댑터 미구현,미실행,,,"서버 원본·기존 manifest 확보(사용자 확인); 로컬 manifest 확보, 이미지 폴더 비어 있음; 추가 조합 프로토콜 미확정"

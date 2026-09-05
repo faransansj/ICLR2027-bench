@@ -1,6 +1,19 @@
-# Medical Benchmark — Phase 1
+# Medical Benchmark
 
-Reproducible, independent `model × dataset × fold` jobs for the six Phase 1 baselines. The pipeline never shares checkpoints across runs, substitutes architectures, or reports blocked work as successful.
+## Current benchmark tracking
+
+- [Phase별 구현·학습·실행 위치·데이터 현황](reports/model_status.md) ([CSV](reports/model_status.csv))
+- [논문 형식 결과표와 출처](reports/benchmark_tables.md): [MILK10k CSV](reports/milk10k_benchmark.csv), [CheXchoNET CSV](reports/chexchonet_benchmark.csv)
+- Management **Phase 1:** MambaVision, TransNeXt, TCMax — both datasets.
+- Management **Phase 2:** IVON, ABNN — both datasets; NCG, HENN — MILK10k; LATA — CheXchoNET.
+- Management **Phase 3:** MedRegA, DyMo — MILK10k; DARC, RadZero — CheXchoNET.
+- Management **Phase-ex:** NCG, HENN — CheXchoNET; LATA — MILK10k (additional adaptations under investigation; metrics/protocols not yet available).
+
+Existing `configs/phases.yaml`, scripts and `results/phase*` retain **historical execution phases** for provenance/resume compatibility; they are not the new management grouping. Refresh aggregate-only reports with `python reports/update_tables.py`. Missing final metrics remain blank; paper-transcribed, legacy and incomplete runs are distinguished.
+
+## Historical pipeline documentation
+
+Reproducible, independent `model × dataset × fold` jobs for the original baselines. The pipeline never shares checkpoints across runs, substitutes architectures, or reports blocked work as successful.
 
 ## Environment
 
@@ -141,9 +154,38 @@ The builder requires one clinical and one dermoscopic image per lesion, matching
 Run TransNeXt and TCMax together after preparing that manifest:
 
 ```bash
-TMPDIR=~/tmp ./scripts/run_phase2.sh --mode full --gpus 0 --folds 0,1,2,3,4 --models transnext,tcmax
+TMPDIR=~/tmp ./scripts/run_phase2.sh --mode full --gpus 0 --folds 0,1,2,3,4 --models transnext,tcmax --datasets milk10k
 ```
+
+## TCMax on both datasets (GPU 5 and 6)
+
+TCMax reuses the pinned official additive-logit objective (including its `-log(batch_size)` constant), evaluated in stable fp32 log-space. MILK10k uses the existing two scratch ResNet-18 streams. CheXchoNET is an **explicit adaptation, not an exact paper architecture reproduction**: scratch ResNet-18 plus a `2 → 64 → 4` ReLU MLP for age/sex, with additive class logits. Age uses the training folds' population mean/std (constant std becomes 1); sex is strictly `F=0, M=1`. Missing/nonfinite age, unknown sex, and patients spanning folds fail closed. Echo measurements are never model inputs. The four-class target is `SLVH + 2*DLV`; softmax marginals `[1,3]` and `[2,3]` feed the existing multilabel metrics at threshold 0.5. Compare with the research model only after matching input modalities and evaluation protocol.
+
+Prepare the existing image roots and separate manifests; these commands do not overwrite the Phase 1 manifests:
+
+```bash
+uv run python scripts/build_milk10k_phase2_manifest.py /path/to/MILK_ISIC_SKIN/TrainingData
+uv run python scripts/build_chexchonet_phase2_manifest.py /path/to/CheXchoNET/metadata.csv
+```
+
+The Chest builder joins official `cxr_filename` metadata onto the existing benchmark manifest, checks labels and patient-level split isolation, and writes only age/sex plus identifiers, targets and existing folds. Neither builder invents missing modalities. Keep private images/metadata on the authorized server.
+
+From the repository root, run **smoke first** (two fold-0 jobs, one epoch, two batches per split):
+
+```bash
+./scripts/run_phase2.sh --mode smoke --models tcmax --datasets milk10k,chexchonet --gpus 5,6 --batch-size 8 --num-workers 4
+```
+
+Check both `results/smoke/phase2/logs/*tcmax*.log` and the two completed `fold_metrics.json` files. Only after both smoke jobs pass, run the ten independent full-fold jobs (100 epochs, uncapped batches):
+
+```bash
+./scripts/run_phase2.sh --mode full --models tcmax --datasets milk10k,chexchonet --gpus 5,6 --folds 0,1,2,3,4 --batch-size 8 --num-workers 4
+```
+
+The scheduler assigns one job per listed physical GPU, not DDP; other GPUs are excluded. `--datasets milk10k` or `--datasets chexchonet` limits the queue. Smoke outputs are isolated from full results under `results/phase2/<dataset>/tcmax/fold_<n>`. Identical completed runs validate and skip; interrupted matching runs restore model, optimizer and RNG/loader states. Changed code/config/data/runtime identities refuse overwrite; retain existing outputs and use the runner's `--output-root` for a deliberately new experiment. Configs, source revision, code hashes, manifests and train-only age statistics are recorded in run provenance. The existing aggregate CLI still targets Phase 1; TCMax metrics are available per fold.
+
+Initial implementation checks included CPU forward/backward for both real architectures, official-loss/gradient parity, metadata validation, mocked interruption/resume and scheduler routing. Subsequent user-provided Yonsei logs confirm legacy TCMax GPU smoke on both datasets; local Chest legacy TCMax training is also now observable. These do not validate the separate paper-budget deployment package. `READY` in a model config denotes implemented support, not provisioned data or GPU validation.
 
 ## Current local status
 
-The source pins, UV lock, dataset contracts, metric/result schemas, checkpoint verification, resume policy, and scheduler are unit-tested. Real smoke completion still requires the private dataset manifests/images, CUDA, and the official model artifacts/dependencies listed above. Full five-fold training has not been run.
+See the timestamped [status snapshot](reports/model_status.md) and [benchmark tables](reports/benchmark_tables.md). Legacy TransNeXt has five-fold results on both datasets; legacy MambaVision and RadZero have five-fold Chest results. Local MILK image storage remains unpopulated at the latest check, despite its manifest being available. Current server execution is only known through the dated user-provided logs, not a live connection. No raw results, dataset files or running-job configurations are changed by report updates.
