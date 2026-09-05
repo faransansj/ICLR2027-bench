@@ -75,6 +75,31 @@
         "peak_gpu_memory_mb": 2275
       }
     },
+    "chexchonet/tcmax": {
+      "status": "COMPLETED",
+      "label": "preliminary 5-fold/10-epoch",
+      "mode": "TCMax image/age/sex adaptation trained from scratch",
+      "folds": [
+        {"fold": 0, "macro_f1": 0.000000, "macro_auroc": 0.755547, "emr": 0.862271},
+        {"fold": 1, "macro_f1": 0.085186, "macro_auroc": 0.739446, "emr": 0.862890},
+        {"fold": 2, "macro_f1": 0.005721, "macro_auroc": 0.736003, "emr": 0.862541},
+        {"fold": 3, "macro_f1": 0.064050, "macro_auroc": 0.750333, "emr": 0.864078},
+        {"fold": 4, "macro_f1": 0.039144, "macro_auroc": 0.754766, "emr": 0.862849}
+      ],
+      "mean": {
+        "macro_f1": 0.038820,
+        "macro_auroc": 0.747219,
+        "emr": 0.862926,
+        "label_f1": {"SLVH": 0.011273, "DLV": 0.066367}
+      },
+      "compute": {
+        "gpu": "NVIDIA GeForce RTX 2080",
+        "precision": "fp32",
+        "batch_size": 8,
+        "params_million": 11.179016,
+        "peak_gpu_memory_mb": 433
+      }
+    },
     "chexchonet/radzero": {
       "status": "COMPLETED",
       "mode": "zero-shot",

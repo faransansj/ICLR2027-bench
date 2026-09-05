@@ -7,15 +7,18 @@ MODE=""
 GPUS="0"
 FOLDS="0,1,2,3,4"
 MODELS=""
+DATASETS="milk10k,chexchonet"
 BATCH_SIZE="8"
 NUM_WORKERS="4"
 MAX_BATCHES=""
 while (($#)); do
+  (($# >= 2)) || { echo "missing value for $1" >&2; exit 64; }
   case "$1" in
     --mode) MODE=${2:-}; shift 2 ;;
     --gpus) GPUS=${2:-}; shift 2 ;;
     --folds) FOLDS=${2:-}; shift 2 ;;
     --models) MODELS=${2:-}; shift 2 ;;
+    --datasets) DATASETS=${2:-}; shift 2 ;;
     --batch-size) BATCH_SIZE=${2:-}; shift 2 ;;
     --num-workers) NUM_WORKERS=${2:-}; shift 2 ;;
     --max-batches) MAX_BATCHES=${2:-}; shift 2 ;;
@@ -23,9 +26,18 @@ while (($#)); do
   esac
 done
 if [[ "$MODE" != smoke && "$MODE" != full ]]; then
-  echo "usage: $0 --mode smoke|full --gpus 0,1 [--folds 0,1,2,3,4] [--models transnext,tcmax,radzero,medrega] [--batch-size 8] [--num-workers 4] [--max-batches N]" >&2
+  echo "usage: $0 --mode smoke|full --gpus 0,1 [--folds 0,1,2,3,4] [--models transnext,tcmax,radzero,medrega] [--datasets milk10k,chexchonet] [--batch-size 8] [--num-workers 4] [--max-batches N]" >&2
   exit 64
 fi
+[[ "$BATCH_SIZE" =~ ^[0-9]+$ && "$BATCH_SIZE" =~ [1-9] ]] || { echo "--batch-size must be a positive integer" >&2; exit 64; }
+[[ "$NUM_WORKERS" =~ ^[0-9]+$ ]] || { echo "--num-workers must be a nonnegative integer" >&2; exit 64; }
+[[ -z "$MAX_BATCHES" || ( "$MAX_BATCHES" =~ ^[0-9]+$ && "$MAX_BATCHES" =~ [1-9] ) ]] || { echo "--max-batches must be a positive integer" >&2; exit 64; }
+cd "$ROOT"
+IFS=, read -r -a dataset_list <<< "$DATASETS"
+((${#dataset_list[@]})) || { echo "--datasets cannot be empty" >&2; exit 64; }
+for dataset in "${dataset_list[@]}"; do
+  case "$dataset" in milk10k|chexchonet) ;; *) echo "unknown dataset: $dataset" >&2; exit 64 ;; esac
+done
 IFS=, read -r -a gpu_list <<< "$GPUS"
 if [[ -n "$MODELS" ]]; then IFS=, read -r -a model_list <<< "$MODELS"; else model_list=(transnext tcmax radzero medrega); fi
 for model in "${model_list[@]}"; do
@@ -33,6 +45,15 @@ for model in "${model_list[@]}"; do
 done
 ((${#gpu_list[@]})) || { echo "--gpus cannot be empty" >&2; exit 64; }
 for gpu in "${gpu_list[@]}"; do [[ "$gpu" =~ ^[0-9]+$ ]] || { echo "invalid GPU: $gpu" >&2; exit 64; }; done
+# Duplicate queue keys would concurrently overwrite the same independent run.
+for list in "$GPUS" "$DATASETS" "$MODELS" "$FOLDS"; do
+  IFS=, read -r -a entries <<< "$list"
+  seen=","
+  for entry in "${entries[@]}"; do
+    [[ "$seen" != *",$entry,"* ]] || { echo "duplicate selection: $entry" >&2; exit 64; }
+    seen+="$entry,"
+  done
+done
 
 if command -v uv >/dev/null 2>&1; then runner=(uv run python); elif command -v python3 >/dev/null 2>&1; then runner=(python3); else
   echo "BLOCKED: neither uv nor python3 is available" >&2
@@ -57,10 +78,14 @@ for fold in "${fold_list[@]}"; do
   [[ "$fold" =~ ^[0-4]$ ]] || { echo "invalid fold: $fold (expected 0-4)" >&2; exit 64; }
   for model in "${model_list[@]}"; do
     case "$model" in
-      transnext) printf 'milk10k\t%s\t%s\tphase1\n' "$model" "$fold" >> "$jobs" ;;
-      radzero) printf 'chexchonet\t%s\t%s\tradzero\n' "$model" "$fold" >> "$jobs" ;;
-      medrega) printf 'milk10k\t%s\t%s\tblock\n' "$model" "$fold" >> "$jobs" ;;
-      tcmax) printf 'milk10k\t%s\t%s\ttcmax\n' "$model" "$fold" >> "$jobs" ;;
+      transnext) [[ ",$DATASETS," != *,milk10k,* ]] || printf 'milk10k\t%s\t%s\tphase1\n' "$model" "$fold" >> "$jobs" ;;
+      radzero) [[ ",$DATASETS," != *,chexchonet,* ]] || printf 'chexchonet\t%s\t%s\tradzero\n' "$model" "$fold" >> "$jobs" ;;
+      medrega) [[ ",$DATASETS," != *,milk10k,* ]] || printf 'milk10k\t%s\t%s\tblock\n' "$model" "$fold" >> "$jobs" ;;
+      tcmax)
+        for dataset in "${dataset_list[@]}"; do
+          printf '%s\t%s\t%s\ttcmax\n' "$dataset" "$model" "$fold" >> "$jobs"
+        done
+        ;;
     esac
   done
 done
@@ -120,7 +145,7 @@ worker() {
         rc=$?
         ;;
       tcmax)
-        args=(-m medical_benchmark.runners.train_tcmax --dataset "$dataset" --fold "$fold" --runtime "$runtime" --output-root "$output_root")
+        args=(-m medical_benchmark.runners.train_tcmax --dataset "$dataset" --fold "$fold" --runtime "$runtime" --output-root "$output_root" --batch-size "$BATCH_SIZE" --num-workers "$NUM_WORKERS")
         [[ -z "$MAX_BATCHES" ]] || args+=(--max-train-batches "$MAX_BATCHES" --max-val-batches "$MAX_BATCHES")
         CUDA_VISIBLE_DEVICES="$gpu" PYTHONPATH="$ROOT/src" "${runner[@]}" "${args[@]}" >"$log_dir/${dataset}-${model}-${fold}.log" 2>&1
         rc=$?

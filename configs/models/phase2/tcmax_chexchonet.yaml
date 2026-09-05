@@ -9,6 +9,13 @@ multilabel_probabilities:
   SLVH: [1, 3]
   DLV: [2, 3]
 training: from_scratch
-status: BLOCKED
-blocked_reason: unavailable implementation
-detail: Source and modality protocol are pinned; the CheXchoNet image-tabular loader and TCMax training runner remain to be implemented.
+status: VALIDATED_PRELIMINARY
+validation_label: preliminary 5-fold/10-epoch
+input_size: 224
+adaptation: TCMax additive-logit loss with scratch ResNet-18 image encoder and age/sex MLP; not an exact paper architecture reproduction
+image_encoder: resnet18
+tabular_hidden: 64
+sex_encoding: {F: 0, M: 1}
+age_normalization: train_mean_std_population_constant_std_one
+missing_metadata: error
+joint_target: SLVH + 2 * DLV

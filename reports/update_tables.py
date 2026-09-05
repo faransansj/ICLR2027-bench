@@ -23,9 +23,9 @@ TARGETS.update({m: ('chexchonet',) for m in ('LATA', 'DARC', 'RadZero')})
 EXTRAS = (('NCG', 'chexchonet'), ('HENN', 'chexchonet'), ('LATA', 'milk10k'))
 # Manually verified readiness, not inferred from a config named READY.
 IMPLEMENTATION = {
-    'MambaVision': '기존 러너 구현 / 신규 패키지 CUDA smoke 미검증',
-    'TransNeXt': '기존 러너 구현 / 신규 CPU forward 검증·GPU smoke 미검증',
-    'TCMax': '기존 두 데이터셋 러너 구현 / 논문 예산 적용판 CPU 검증·GPU smoke 미검증',
+    'MambaVision': '기존 러너 구현 / 신규 두 데이터셋 GPU smoke 완료(사용자 종료코드 로그)',
+    'TransNeXt': '기존 러너 구현 / 신규 두 데이터셋 GPU smoke 완료(사용자 종료코드 로그)',
+    'TCMax': '두 데이터셋 러너 구현·GPU smoke 완료 / CheXchoNET 예비 5-fold·10-epoch 검증 완료',
     'IVON': '공식 v0.1.2 CPU 실행 검증 / 실제 데이터 학습 러너 미완성',
     'ABNN': '공식 구현 조사 / 학습 어댑터 미구현',
     'NCG': '공식 구현 조사 / DAG·train-only 어댑터 미준비',
@@ -129,13 +129,22 @@ def main():
                 n = len(complete[ds, model])
                 active = [line for line in live if f'--dataset {ds}' in line and
                           (f'--model {model.lower()}' in line or (model == 'TCMax' and 'runners.train_tcmax ' in line))]
-                training = f'{n}/5 완료' if n else '완료 결과 없음'
+                training = f'로컬 보관 결과 {n}/5 완료' if n else '로컬 보관 완료 결과 없음'
                 if model == 'RadZero' and n: training += ' (zero-shot 평가)'
                 if active: training += ' / 로컬 실행 중'
                 if model == 'MambaVision' and ds == 'milk10k': training += ' / 과거 mamba_ssm 누락 차단'
                 server = '로컬 NixOS / RTX 2080' if active else ''
-                remote = '연세대 GPU 5·6, 2026-09-06 01:17:54 KST 사용자 캡처: 기존 benchmark 실행 / 현 dataset·fold 미확인' if model == 'TCMax' else ''
+                remote = ''
+                if model == 'TCMax':
+                    legacy = '기존 4/5 완료(0–3), fold4 미완료' if ds == 'milk10k' else '기존 2/5 완료(0–1), fold2·3 checkpoint 보존, fold4 미완료'
+                    gpu = '5' if ds == 'milk10k' else '6'
+                    remote = f'연세대: {legacy}; 기존 스케줄러 종료 사용자 확인; 신규 GPU{gpu} fold0 smoke 3epoch 완료·종료코드0 / 새 본학습 미시작'
+                elif model in ('MambaVision', 'TransNeXt'):
+                    gpu = '6' if ds == 'milk10k' else '5'
+                    remote = f'연세대 신규: GPU{gpu} fold0 smoke 완료·종료코드0; reference4조합 전체 SMOKE_EXIT=0 사용자 확인 / 새 본학습 미시작'
                 data = '서버 원본·기존 manifest 확보(사용자 확인); 로컬 manifest 확보, 이미지 폴더 비어 있음' if ds == 'milk10k' else '서버 원본·manifest 확보(사용자 확인); 로컬 원본 링크·manifest 확보'
+                if model in PHASES[1]:
+                    data += '; 서버 신규 manifests/' + ds + '.csv 생성 성공 사용자 확인'
                 if model in ('NCG', 'HENN', 'LATA', 'DyMo', 'MedRegA'):
                     data += '; 방법별 추가 입력/아티팩트는 미준비'
                 status_rows.append([str(phase), model, ds, IMPLEMENTATION[model], training, server, remote, data])
@@ -143,14 +152,15 @@ def main():
         data = next(row[7] for row in status_rows if row[2] == ds)
         status_rows.append(['ex', model, ds, '추가 적용 검토 / 해당 데이터셋 어댑터 미구현',
                             '미실행', '', '', data + '; 추가 조합 프로토콜 미확정'])
-    header = ['Phase', '모델', '대상 데이터셋', '구현·검증', '학습·평가', '현재 실행 위치(로컬 직접 확인)', '서버 마지막 확인(현재 상태 아님)', '데이터 확보']
+    header = ['Phase', '모델', '대상 데이터셋', '구현·검증', '학습·평가', '현재 실행 위치(로컬 직접 확인)', '서버 최신 제공 로그 기준(실시간 아님)', '데이터 확보']
     csv_write('model_status.csv', header, status_rows)
     status_text = f'''# 모델 구현·학습 현황\n\n갱신: {now}\n\n사용자 지정 관리 Phase: **1 MambaVision/TransNeXt/TCMax**, **2 IVON/ABNN/NCG/HENN/LATA**, **3 MedRegA/DyMo/DARC/RadZero**.\n기존 `configs/phases.yaml`과 `results/phase*`는 과거 실행 provenance이며 변경하지 않았다. 새 관리 Phase는 이 문서/CSV가 기준이다.\n빈칸은 실행 없음 또는 미확정이며 0점이 아니다. 타깃은 대화에서 확인된 조합만 기록했다.\n\n'''
     for phase in PHASES:
         status_text += f'## Phase {phase}\n\n' + table(header[1:], [r[1:] for r in status_rows if r[0] == str(phase)]) + '\n\n'
     status_text += '## Phase-ex — 추가 데이터셋 적용 검토\n\n사용자 요청으로 추가 조합을 Phase-ex에 별도 분류했다. 구현·실험 설정은 아직 미확정이며 성능/실행 위치는 빈칸이다. 기본 Phase 2 대상과 혼합하지 않는다.\n\n'
     status_text += table(header[1:], [r[1:] for r in status_rows if r[0] == 'ex']) + '\n\n'
-    status_text += '''## 판독 주의\n\n- 현재 서버 접속 없음: 연세대 작업의 완료 fold/현재 dataset/PID 매핑을 직접 검증하지 못했다. 로컬 TCMax와 서버 TCMax를 합산하지 않는다.\n- `--runtime server`라는 이름만으로 실행 서버를 판단하지 않는다. 로컬 TCMax는 실제 RTX 2080에서 실행 중이다.\n- 수정 패키지 `../model-suite-staging/`: CPU 18개 테스트 통과(기록); 신규 6개 조합 GPU smoke는 미확인. 기존 학습 성공이 새 패키지 검증을 대신하지 않는다.\n- 기존 이미지 전용 MambaVision/TransNeXt와 멀티모달 TCMax의 입력·예산이 다르다. 논문 조건 동일 재현으로 표시하지 않는다.\n- MILK 원본 메타데이터 조사상 결측: 나이 20병변(40행), 부위 31병변(62행); train 중앙값+indicator/MISSING 승인. paired 측정값 사용도 이후 사용자 승인되었으나 최신 staging의 비대칭 차단 구현과는 구분한다(현 데이터 비대칭 0).\n- 데이터 수: 기존 MILK manifest 5,240병변, Chest manifest 71,589영상. 이는 파일 목록 행 수이며 모든 이미지의 바이트 무결성 검사를 뜻하지 않는다.\n- NCG/HENN의 추가 Chest 적용, LATA의 추가 MILK 적용은 Phase-ex 검토 대상으로 분리했다. 성능과 구체 프로토콜은 미확정(빈칸). 기본 Phase 2 우선 dataset은 각각 MILK/MILK/Chest다.\n\n## 현재 로컬 실행 (프로세스 스냅샷)\n\n'''
+    status_text += '''## 로컬 TCMax CheXchoNET 예비 검증 근거\n\nRTX 2080, FP32, batch 8, 공식 5개 fold에서 각각 10 epoch를 완료했다. 다섯 run manifest의 `COMPLETED`, 총 50개 연속 epoch 기록, fold별 필수 artifact 6종과 run identity를 검증했으며 학습 오류 로그는 없었다. 공개 결과는 sample 단위 artifact가 아닌 aggregate만 사용하며 **preliminary 5-fold/10-epoch**로 표시한다.\n\n- Macro-F1: 0.038820\n- Macro-AUROC: 0.747219\n- EMR: 0.862926\n- Label F1: SLVH 0.011273, DLV 0.066367\n- 4상태 집계는 저장된 `target_0/prediction_0=SLVH`, `target_1/prediction_1=DLV` 이진 결정을 `SLVH + 2*DLV`로 매핑해 계산한다.\n\n## 서버 신규 패키지 검증 근거 (2026-09-06 사용자 제공)\n\n위치: 연세대 L40S 서버 `model-suite-smoke-20260906/`.\n배포 archive SHA256: `01029612ef6a522d0ce676ddce6c9881e4db0148922de9b498d11d2c19e782ab`.\n독립 환경 설치/두 신규 manifest 생성 성공. TCMax 결과는 본학습 수치가 아닌 bounded smoke다.\n\n| 모델 | Dataset | 근거 | 현재 판정 |\n| --- | --- | --- | --- |\n| TCMax 적용판 | MILK10k | GPU5, fold0, epoch0–2, COMPLETED, rc=0 | GPU smoke 완료 |\n| TCMax 적용판 | CheXchoNET | GPU6, fold0, epoch0–2, COMPLETED, rc=0 | GPU smoke 완료 |\n| MambaVision | MILK10k | GPU6, fold0, rc=0 | GPU smoke 완료 |\n| MambaVision | CheXchoNET | GPU5, fold0, rc=0 | GPU smoke 완료 |\n| TransNeXt | MILK10k | GPU6, fold0, rc=0 | GPU smoke 완료 |\n| TransNeXt | CheXchoNET | GPU5, fold0, rc=0 | GPU smoke 완료 |\n\n- 이전 ps에서는 마지막 reference 사전검사가 관측되었고, 이후 사용자가 네 작업 모두 rc=0 및 전체 SMOKE_EXIT=0을 제공했다. 최종 판정은 이 종료코드 증거를 따른다.\n- TCMax 로그: `logs/smoke/{milk10k,chexchonet}-fold0.log`. 결과: `outputs/tcmax_resnet18_paper_budget_adaptation/smoke/<dataset>/fold_0`.\n- reference 학습 로그: `logs/reference-smoke/`. 최종 네 작업 종료코드0 및 SMOKE_EXIT=0 확인. 서버 원시 결과 파일은 아직 로컬로 동기화하지 않았으며, 상세 수치/별도 결과 검증기 실행은 추가 확인 대상이다.\n- 기존 TCMax는 별도 `medical-benchmark/`에서 PGID2111310 종료 완료를 사용자가 확인했다. 종료 전 Chest fold2 last epoch73/best0, fold3 last44/best1 읽기 확인; 파일 삭제 없음.\n- 기존 서버 MILK 완료 fold0–3(4/5), Chest 완료 fold0–1(2/5). 중단된 fold2·3 및 미실행 fold4를 완료로 계산하지 않는다.\n- 신규 여섯 GPU smoke 모두 통과. 서버 신규 본학습 시작 증거는 없으며 별도 full 실행이 필요하다. smoke 성능을 논문용 5-fold 표에 넣지 않는다.\n\n'''
+    status_text += '''## 판독 주의\n\n- 서버 상태는 2026-09-06 사용자 제공 종료 확인·smoke 로그·ps 출력 기준이다. 직접 원격 재조회가 아니며 보고서 생성 시간이 서버 확인 시간을 뜻하지 않는다. 로컬 TCMax와 서버 TCMax는 합산하지 않는다.\n- `--runtime server`라는 이름만으로 실행 서버를 판단하지 않는다. 현재 로컬 실행은 하단 프로세스 스냅샷을 따른다.\n- 수정 패키지 `../model-suite-staging/`: CPU 18개 테스트 통과(기록); 신규 TCMax MILK/Chest GPU smoke 2/2 완료(각3epoch·2배치 제한), MambaVision/TransNeXt 4조합 완료(각1epoch·2배치 제한). 총6조합 사용자 제공 성공 종료코드 확인. 기존 학습 성공이 새 패키지 검증을 대신하지 않는다.\n- 기존 이미지 전용 MambaVision/TransNeXt와 멀티모달 TCMax의 입력·예산이 다르다. 논문 조건 동일 재현으로 표시하지 않는다.\n- MILK 원본 메타데이터 조사상 결측: 나이 20병변(40행), 부위 31병변(62행); train 중앙값+indicator/MISSING 승인. paired 측정값 사용도 이후 사용자 승인되었으나 최신 staging의 비대칭 차단 구현과는 구분한다(현 데이터 비대칭 0).\n- 데이터 수: 기존 MILK manifest 5,240병변, Chest manifest 71,589영상. 이는 파일 목록 행 수이며 모든 이미지의 바이트 무결성 검사를 뜻하지 않는다.\n- NCG/HENN의 추가 Chest 적용, LATA의 추가 MILK 적용은 Phase-ex 검토 대상으로 분리했다. 성능과 구체 프로토콜은 미확정(빈칸). 기본 Phase 2 우선 dataset은 각각 MILK/MILK/Chest다.\n\n## 현재 로컬 실행 (프로세스 스냅샷)\n\n'''
     # Only operational arguments, no private samples or credentials.
     status_text += '```text\n' + ('\n'.join(live) or '학습 프로세스 없음') + '\n```\n'
     (OUT / 'model_status.md').write_text(status_text)
@@ -186,14 +196,15 @@ def main():
             values += [mean([r[1]['macro_f1'] for r in runs])]
             values += [spread([s[i] for s in states]) for i in range(4)]
             values += [mean([r[1]['emr'] for r in runs])]
-            origin, count = '기존 결과 / 4상태 F1은 저장 binary prediction에서 재계산', '5/5'
+            condition = 'preliminary 5-fold/10-epoch' if model == 'TCMax' else '기존 결과'
+            origin, count = f'{condition} / 4상태 F1은 저장 binary prediction에서 재계산', '5/5'
         else:
             values, origin, count = ['']*8, '미완료 / 숫자 미기입', f'{len(runs)}/5'
         if '[Phase-ex]' in model: origin = 'Phase-ex 추가 적용 검토 / 미실행'
         chest.append([model] + values + [origin, count])
     ch = ['Method', 'SLVH F1', 'DLV F1', 'Avg F1', 'Neither F1', 'SLVH only F1', 'DLV only F1', 'Both F1', 'EMR', '출처·조건', '완료 folds']
     csv_write('chexchonet_benchmark.csv', ch, chest)
-    text = f'''# 논문 형식 벤치마크 표\n\n갱신: {now}\n\n- 완료된 **5개 fold**만 평균±표본 표준편차(ddof=1), 소수점 2자리로 집계한다. Macro/Avg-F1·EMR은 fold 평균이다. 빈칸은 미확정/미완료; `0.00`은 실제 반올림 값이다.\n- 사용자 제공 논문 수치는 그대로 전사하며 원시 예측으로 검증한 값이 아니다. 논문 표의 std 정의는 별도 확인 필요.\n- 기존 조건 결과와 논문 행을 함께 표시한 **진행 관리용 표**이며 동일 입력·예산의 최종 비교표가 아니다.\n- 1-fold 중간 결과, smoke, 서버 미동기화 결과는 최종 칸에 채우지 않는다.\n- MILK class index는 기존 LABELS 순서(AKIEC,BCC,BEN_OTH,BKL,DF,INF,MAL_OTH,MEL,NV,SCCKA,VASC)에서 논문 열 순서로 재배열했다.\n\n## MILK10k\n\n'''
+    text = f'''# 논문 형식 벤치마크 표\n\n갱신: {now}\n\n- 완료된 **5개 fold**만 평균±표본 표준편차(ddof=1), 소수점 2자리로 집계한다. Macro/Avg-F1·EMR은 fold 평균이다. 빈칸은 미확정/미완료; `0.00`은 실제 반올림 값이다.\n- 사용자 제공 논문 수치는 그대로 전사하며 원시 예측으로 검증한 값이 아니다. 논문 표의 std 정의는 별도 확인 필요.\n- 기존 조건 결과와 논문 행을 함께 표시한 **진행 관리용 표**이며 동일 입력·예산의 최종 비교표가 아니다.\n- 부분 fold 중간 결과, smoke, 서버 미동기화 결과는 최종 칸에 채우지 않는다. 서버 기존 TCMax는 MILK4/5·Chest2/5 확인 후 중단; 수정 TCMax의 2개 GPU smoke 완료는 본학습 결과가 아니다. 최신 검증 상태는 model_status.md를 따른다.\n- 로컬 TCMax CheXchoNET 완료 행은 **preliminary 5-fold/10-epoch**이며 최종 논문 예산 결과가 아니다.\n- MILK class index는 기존 LABELS 순서(AKIEC,BCC,BEN_OTH,BKL,DF,INF,MAL_OTH,MEL,NV,SCCKA,VASC)에서 논문 열 순서로 재배열했다.\n\n## MILK10k\n\n'''
     text += table(mh, milk) + '\n\n## CheXchoNET\n\n' + table(ch, chest)
     text += '\n\nChest 4상태 F1은 `target_0/prediction_0=SLVH`, `target_1/prediction_1=DLV`로 저장된 예측을 사용한다. 별도 categorical argmax로 바꾸지 않는다. 원래 fold_metrics의 state_f1가 빈 경우에도 예측 CSV에서 계산하며 원본은 수정하지 않는다.\n\n## 중간 결과 (최종 표에 미반영)\n\n'
     partial = []
